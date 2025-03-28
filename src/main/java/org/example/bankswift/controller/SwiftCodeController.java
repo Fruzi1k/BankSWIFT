@@ -1,6 +1,5 @@
 package org.example.bankswift.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.example.bankswift.model.SwiftCode;
 import org.example.bankswift.service.SwiftCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,35 +7,41 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/swift-codes")
 public class SwiftCodeController {
+
     private final SwiftCodeService swiftCodeService;
 
-    @Autowired  // Автоматическое внедрение зависимости
+
+    @Autowired
     public SwiftCodeController(SwiftCodeService swiftCodeService) {
         this.swiftCodeService = swiftCodeService;
     }
 
     @GetMapping("/{swiftCode}")
-    public ResponseEntity<SwiftCode> getSwiftCode(@PathVariable("swiftCode") String swiftCode) {
-        return swiftCodeService.getSwiftCode(swiftCode).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<SwiftCode> getSwiftCode(@PathVariable String swiftCode) {
+        Optional<SwiftCode> result = swiftCodeService.getSwiftCodeById(swiftCode);
+        return result.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/country/{countryISO2}")
-    public ResponseEntity<List<SwiftCode>> getSwiftCodesByCountry(@PathVariable("countryISO2") String countryISO2) {
-        return ResponseEntity.ok(swiftCodeService.getAllSwiftCodesByCountry(countryISO2));
+    @GetMapping("/country/{countryISO2code}")
+    public List<SwiftCode> getSwiftCodesByCountry(@PathVariable String countryISO2code) {
+        return swiftCodeService.getSwiftCodesByCountry(countryISO2code);
     }
 
-    @PostMapping("/country/{countryISO2}")
-    public ResponseEntity<SwiftCode> addSwiftCode(@PathVariable("countryISO2") String countryISO2, @RequestBody SwiftCode swiftCode) {
-        return  ResponseEntity.ok(swiftCodeService.addSwiftCode(swiftCode));
+    @PostMapping
+    public ResponseEntity<String> addSwiftCode(@RequestBody SwiftCode swiftCode) {
+        swiftCodeService.addSwiftCode(swiftCode);
+        return ResponseEntity.ok("SWIFT code added successfully");
     }
 
     @DeleteMapping("/{swiftCode}")
-    public ResponseEntity<String> deleteSwiftCode(@PathVariable("swiftCode") String swiftCode) {
+    public ResponseEntity<String> deleteSwiftCode(@PathVariable String swiftCode) {
         swiftCodeService.deleteSwiftCode(swiftCode);
-        return ResponseEntity.ok("Swift code deleted");
+        return ResponseEntity.ok("SWIFT code deleted successfully");
     }
 }

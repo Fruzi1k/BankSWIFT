@@ -1,6 +1,5 @@
 package org.example.bankswift.service;
 
-
 import org.example.bankswift.model.SwiftCode;
 import org.example.bankswift.repository.SwiftCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,18 +10,19 @@ import java.util.Optional;
 
 @Service
 public class SwiftCodeService {
+
     private final SwiftCodeRepository swiftCodeRepository;
 
-    @Autowired  // Автоматическое внедрение зависимости
+    @Autowired
     public SwiftCodeService(SwiftCodeRepository swiftCodeRepository) {
         this.swiftCodeRepository = swiftCodeRepository;
     }
 
-    public Optional<SwiftCode> getSwiftCode(String swiftCode) {
-        return swiftCodeRepository.findById(swiftCode);
+    public Optional<SwiftCode> getSwiftCodeById(String swiftCode) {
+        return swiftCodeRepository.findBySwiftCode(swiftCode);
     }
 
-    public List<SwiftCode> getAllSwiftCodesByCountry(String countryISO2) {
+    public List<SwiftCode> getSwiftCodesByCountry(String countryISO2) {
         return swiftCodeRepository.findByCountryISO2(countryISO2);
     }
 
@@ -30,7 +30,11 @@ public class SwiftCodeService {
         return swiftCodeRepository.save(swiftCode);
     }
 
-    public void deleteSwiftCode(String code) {
-        swiftCodeRepository.deleteById(code);
+    public void deleteSwiftCode(String swiftCode) {
+        swiftCodeRepository.deleteById(swiftCode);
+    }
+
+    public List<SwiftCode> parseAndStoreSwiftCodes(List<SwiftCode> swiftCodes) {
+        return swiftCodeRepository.saveAll(swiftCodes);
     }
 }
